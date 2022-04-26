@@ -144,6 +144,9 @@ int main()
         
         window.display();
     }
+    
+    for (auto i : head.m_SnakeList)
+        delete i;
 
     return EXIT_SUCCESS;
 }
