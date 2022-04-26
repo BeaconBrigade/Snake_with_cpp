@@ -17,7 +17,7 @@ class Snake
 {
 public:
     static sf::Texture m_Texture;
-    static std::vector<Snake> m_SnakeList;
+    static std::vector<Snake*> m_SnakeList;
     static sf::Vector2<float> m_HeadDirection;
     sf::Sprite m_Sprite;
 public:

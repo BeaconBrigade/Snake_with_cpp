@@ -40,11 +40,14 @@ int main()
     
     // head snake
     Snake head(true);
-    head.m_Sprite.setColor(sf::Color(255, 0, 0));
-    Snake follow1(false);
-    follow1.m_Sprite.setColor(sf::Color(0, 255, 0));
-    Snake follow2(false);
-
+    head.m_Sprite.setColor(sf::Color(rand() % 255, rand() % 255, rand() % 255));
+    
+    for (int i = 0; i < 1600; i++)
+    {
+        Snake* snek = new Snake(false);
+        snek->m_Sprite.setColor(sf::Color(rand() % 255, rand() % 255, rand() % 255));
+    }
+    
     // Start the game loop
     while (window.isOpen())
     {
@@ -97,6 +100,9 @@ int main()
                         }
                     }
                     break;
+                case sf::Event::LostFocus :
+                    pause(&window);
+                    break;
                 default :
                     break;
             }
@@ -109,9 +115,25 @@ int main()
         // update all following snake positions
         for (int i = head.m_SnakeList.size() - 1; i > 0; i--)
         {
-            head.m_SnakeList[i].m_Sprite.setPosition(head.m_SnakeList[i - 1].m_Sprite.getPosition());
-            window.draw(head.m_SnakeList[i].m_Sprite);
+            head.m_SnakeList[i]->m_Sprite.setPosition(head.m_SnakeList[i - 1]->m_Sprite.getPosition());
+            window.draw(head.m_SnakeList[i]->m_Sprite);
         }
+        
+        /*
+         pseudo code for updating snakes
+         
+         list [1, 0, 0, 0]                   |   list [0, 0, 0, 0]
+                                             |
+         for (i = size - 1; i > 0; i--)      |
+             list[i] = list[i-1]             |
+         list[0]++                           |
+                                             |
+         list [2, 1, 0, 0] -> after one run  |   list [1, 0, 0, 0] -> seems to add up...
+         list [3, 2, 1, 0]                   |   list [2, 1, 0, 0]
+         list [4, 3, 2, 1]                   |   list [3, 2, 1, 0]
+         list [5, 4, 3, 2]                   |   list [4, 3, 2, 1]
+         
+         */
         
         // update head snake
         if (doneMoving)

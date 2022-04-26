@@ -8,7 +8,7 @@
 
 #include "snake.hpp"
 sf::Vector2f Snake::m_HeadDirection = sf::Vector2<float>(0.f, 0.f);
-std::vector<Snake> Snake::m_SnakeList;
+std::vector<Snake*> Snake::m_SnakeList;
 sf::Texture Snake::m_Texture;
 
 Snake::Snake(bool isLead)
@@ -21,5 +21,5 @@ Snake::Snake(bool isLead)
     
     Snake::m_Sprite.setTexture(Snake::m_Texture);
     
-    Snake::m_SnakeList.push_back(*this);
+    Snake::m_SnakeList.push_back(this);
 }
