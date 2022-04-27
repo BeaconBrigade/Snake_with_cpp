@@ -20,8 +20,6 @@
 #include <iostream>
 #include "snake.hpp"
 
-const float BLOCK_WIDTH = 20.0f;
-
 const sf::Vector2<float> UP (0.f, -BLOCK_WIDTH / 2);
 const sf::Vector2<float> DOWN (0.f, BLOCK_WIDTH / 2);
 const sf::Vector2<float> LEFT (-BLOCK_WIDTH / 2, 0.f);
@@ -33,20 +31,21 @@ int main()
 {
     bool hasChangedDirection = false, doneMoving = true;
     sf::Vector2f toChange(0.f, 0.f);
+    int score = 0;
     
-    // Create the main window
+    // create the main window
     sf::RenderWindow window(sf::VideoMode(800, 800), "Snake Game!");
     window.setFramerateLimit(30);
     
     // head snake
-    Snake head(true);
-    head.m_Sprite.setColor(sf::Color(rand() % 255, rand() % 255, rand() % 255));
+    Snake head(true, true);
     
-    for (int i = 0; i < 1600; i++)
-    {
-        Snake* snek = new Snake(false);
-        snek->m_Sprite.setColor(sf::Color(rand() % 255, rand() % 255, rand() % 255));
-    }
+    // initial follower snakes
+    for (int i = 0; i < 8; i++)
+        Snake* snek = new Snake(false, true);
+
+    // food
+    Food* snack = new Food();
     
     // Start the game loop
     while (window.isOpen())
@@ -108,6 +107,19 @@ int main()
             }
         }
         hasChangedDirection = false;
+        
+        // eating food
+        if (head.m_Sprite.getPosition() == snack->m_Sprite.getPosition())
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                Snake* snek = new Snake(false, true);
+                snek->m_Sprite.setPosition(head.m_Sprite.getPosition()); // so snakes don't appear in the corner
+            }
+            delete snack;
+            snack = new Food();
+            score += 3;
+        }
             
         // Clear screen
         window.clear();
@@ -119,21 +131,7 @@ int main()
             window.draw(head.m_SnakeList[i]->m_Sprite);
         }
         
-        /*
-         pseudo code for updating snakes
-         
-         list [1, 0, 0, 0]                   |   list [0, 0, 0, 0]
-                                             |
-         for (i = size - 1; i > 0; i--)      |
-             list[i] = list[i-1]             |
-         list[0]++                           |
-                                             |
-         list [2, 1, 0, 0] -> after one run  |   list [1, 0, 0, 0] -> seems to add up...
-         list [3, 2, 1, 0]                   |   list [2, 1, 0, 0]
-         list [4, 3, 2, 1]                   |   list [3, 2, 1, 0]
-         list [5, 4, 3, 2]                   |   list [4, 3, 2, 1]
-         
-         */
+        window.draw(snack->m_Sprite);
         
         // update head snake
         if (doneMoving)
@@ -144,9 +142,6 @@ int main()
         
         window.display();
     }
-    
-    for (auto i : head.m_SnakeList)
-        delete i;
 
     return EXIT_SUCCESS;
 }
