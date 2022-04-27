@@ -18,6 +18,7 @@
 #include <SFML/Graphics.hpp>
 #include "ResourcePath.hpp"
 #include <iostream>
+#include <string>
 #include "snake.hpp"
 
 const sf::Vector2<float> UP (0.f, -BLOCK_WIDTH / 2);
@@ -168,24 +169,16 @@ void pause(sf::RenderWindow* window)
         {
             // display countdown before starting again
             countdown.setPosition(sf::Vector2f(375, 375));
-            countdown.setString("3");
-            window->clear();
-            window->draw(countdown);
-            window->display();
             
-            sf::sleep(sf::seconds(1.f));
-            countdown.setString("2");
-            window->clear();
-            window->draw(countdown);
-            window->display();
+            for (int i = 3; i > 0; i--)
+            {
+                countdown.setString(std::to_string(i));
+                window->clear();
+                window->draw(countdown);
+                window->display();
+                sf::sleep(sf::seconds(1.f));
+            }
             
-            sf::sleep(sf::seconds(1.f));
-            countdown.setString("1");
-            window->clear();
-            window->draw(countdown);
-            window->display();
-            
-            sf::sleep(sf::seconds(1.f));
             countdown.setString("GO!");
             window->clear();
             window->draw(countdown);

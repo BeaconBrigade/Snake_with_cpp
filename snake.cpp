@@ -12,6 +12,7 @@ std::vector<Snake*> Snake::m_SnakeList;
 sf::Texture Snake::m_Texture;
 
 const float SCALE = BLOCK_WIDTH / 20.0f;
+static int offsetDirection = -1, offset = 255;
 
 Snake::Snake(bool isLead, bool isSnake)
 {
@@ -26,17 +27,27 @@ Snake::Snake(bool isLead, bool isSnake)
     
     if (isSnake)
         Snake::m_SnakeList.push_back(this);
+    
+    // set colour
+    Snake::m_Sprite.setColor(sf::Color(offset, offset, offset));
+    if (offset < 155)
+        offsetDirection = 1;
+    else if (offset >= 252)
+        offsetDirection = -1;
+    offset += 6 * offsetDirection;
 }
 
 Food::Food()
 {
-    bool flagRaised = false;
+    bool flagRaised;
     sf::Vector2f candidatePos;
+    
     Food::m_Sprite.setTexture(Food::m_Texture);
     Food::m_Sprite.setColor(sf::Color::Green);
     
     do
     {
+        flagRaised = false;
         candidatePos = sf::Vector2f((rand() % (40 / (int)SCALE)) * (int)BLOCK_WIDTH, (rand() % (40 / (int)SCALE)) * (int)BLOCK_WIDTH);
         
         for (Snake* i : Food::m_SnakeList)
