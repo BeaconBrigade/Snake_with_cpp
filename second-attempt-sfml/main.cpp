@@ -16,41 +16,61 @@
 
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
+#include <string>
 #include "ResourcePath.hpp"
-#include <iostream>
 #include "snake.hpp"
 
 const sf::Vector2<float> UP (0.f, -BLOCK_WIDTH / 2);
 const sf::Vector2<float> DOWN (0.f, BLOCK_WIDTH / 2);
 const sf::Vector2<float> LEFT (-BLOCK_WIDTH / 2, 0.f);
 const sf::Vector2<float> RIGHT (BLOCK_WIDTH / 2, 0.f);
+static sf::Font font;
 
-void pause(sf::RenderWindow*);
+void pause(sf::RenderWindow *w);
+bool endOfGame(sf::RenderWindow *w, int& score);
+bool gameLoop(sf::RenderWindow&);
 
 int main()
 {
-    bool hasChangedDirection = false, doneMoving = true;
-    sf::Vector2f toChange(0.f, 0.f);
-    int score = 0;
-    
     // create the main window
     sf::RenderWindow window(sf::VideoMode(800, 800), "Snake Game!");
-    window.setFramerateLimit(30);
+    window.setFramerateLimit(24); // normal is 24
+    
+    while (window.isOpen())
+    {
+        if (!gameLoop(window))
+            return EXIT_SUCCESS;
+    }
+    
+    return EXIT_SUCCESS;
+}
+
+bool gameLoop(sf::RenderWindow& window)
+{
+    // game setup
+    bool hasChangedDirection = false, brokeBoundaries = false, doneMoving = true, started = false;
+    sf::Vector2f toChange(0.f, 0.f);
+    int score, frames = 0;
     
     // head snake
     Snake head(true, true);
     
     // initial follower snakes
     for (int i = 0; i < 8; i++)
-        Snake* snek = new Snake(false, true);
+        Snake *snek = new Snake(false, true);
+        
+    score = head.m_SnakeList.size();
 
     // food
-    Food* snack = new Food();
+    Food *snack = new Food();
     
-    // Start the game loop
+    // start game with a pause
+    pause(&window);
+    
+    // start the game loop
     while (window.isOpen())
     {
-        // Process events
+        // event handling
         sf::Event event;
         while (window.pollEvent(event))
         {
@@ -106,22 +126,22 @@ int main()
                     break;
             }
         }
-        hasChangedDirection = false;
         
         // eating food
         if (head.m_Sprite.getPosition() == snack->m_Sprite.getPosition())
         {
             for (int i = 0; i < 3; i++)
             {
-                Snake* snek = new Snake(false, true);
+                Snake *snek = new Snake(false, true);
                 snek->m_Sprite.setPosition(head.m_Sprite.getPosition()); // so snakes don't appear in the corner
+                score++;
             }
             delete snack;
             snack = new Food();
             score += 3;
         }
             
-        // Clear screen
+        // clear screen
         window.clear();
         
         // update all following snake positions
@@ -141,23 +161,74 @@ int main()
         doneMoving = !doneMoving;
         
         window.display();
+        
+        // prevent collision on start of game
+        if (hasChangedDirection)
+            started = true;
+        if (started)
+            frames++;
+        hasChangedDirection = false;
+        
+        // collision with boundaries
+        if (head.m_Sprite.getPosition().x < 0 || head.m_Sprite.getPosition().x > 800 - (int)BLOCK_WIDTH || head.m_Sprite.getPosition().y < 0 || head.m_Sprite.getPosition().y > 800 - (int)BLOCK_WIDTH)
+            brokeBoundaries = true;
+        
+        // collision with self
+        for (int i = 1; i < head.m_SnakeList.size(); i++)
+        {
+            if (head.m_Sprite.getPosition() == head.m_SnakeList[i]->m_Sprite.getPosition() && frames > 8)
+                brokeBoundaries = true;
+        }
+        
+        if (brokeBoundaries)
+            break;
     }
-
-    return EXIT_SUCCESS;
+    
+    window.clear();
+    
+    // update all following snake positions
+    for (int i = head.m_SnakeList.size() - 1; i > 0; i--)
+    {
+        head.m_SnakeList[i]->m_Sprite.setPosition(head.m_SnakeList[i - 1]->m_Sprite.getPosition());
+        head.m_SnakeList[i]->m_Sprite.setColor(sf::Color::Red);
+        window.draw(head.m_SnakeList[i]->m_Sprite);
+    }
+    
+    window.draw(snack->m_Sprite);
+    head.m_Sprite.setColor(sf::Color::Red);
+    window.draw(head.m_Sprite);
+    
+    window.display();
+    sf::sleep(sf::seconds(1));
+    
+    // free memory, make sure not to delete m_SnakeList[0]
+    // because that was stack allocated...
+    for (int i = head.m_SnakeList.size() - 1; i > 0; i--)
+        delete head.m_SnakeList[i];
+    
+    return endOfGame(&window, score);
 }
 
-void pause(sf::RenderWindow* window)
+void initText(sf::Text& text, int size, const char *str, sf::Vector2f pos)
 {
-    sf::Text countdown;
-    sf::Font font;
     if (!font.loadFromFile("ARCAC___.TTF"))
         exit(1);
-    countdown.setFont(font);
-    countdown.setCharacterSize(40);
-    countdown.setString("Press any key to continue");
-    countdown.setPosition(sf::Vector2f(100, 375));
+    text.setFont(font);
+    text.setCharacterSize(size);
+    text.setString(str);
+    text.setPosition(pos);
+}
+
+void pause(sf::RenderWindow *window)
+{
+    // string constant seperated by double spaces because of inconsistent font
+    sf::Text countdown, instruction;
+    initText(countdown, 40, "Press  any  key  to  continue", sf::Vector2f(100, 375));
+    initText(instruction, 40, "use  wasd  to  move", sf::Vector2f(205, 425));
+    
     window->clear();
     window->draw(countdown);
+    window->draw(instruction);
     window->display();
     
     sf::Event event;
@@ -167,25 +238,17 @@ void pause(sf::RenderWindow* window)
         if (event.type == sf::Event::KeyPressed)
         {
             // display countdown before starting again
-            countdown.setPosition(sf::Vector2f(375, 375));
-            countdown.setString("3");
-            window->clear();
-            window->draw(countdown);
-            window->display();
+            countdown.setPosition(375, 375);
             
-            sf::sleep(sf::seconds(1.f));
-            countdown.setString("2");
-            window->clear();
-            window->draw(countdown);
-            window->display();
+            for (int i = 3; i > 0; i--)
+            {
+                countdown.setString(std::to_string(i));
+                window->clear();
+                window->draw(countdown);
+                window->display();
+                sf::sleep(sf::seconds(1.f));
+            }
             
-            sf::sleep(sf::seconds(1.f));
-            countdown.setString("1");
-            window->clear();
-            window->draw(countdown);
-            window->display();
-            
-            sf::sleep(sf::seconds(1.f));
             countdown.setString("GO!");
             window->clear();
             window->draw(countdown);
@@ -198,6 +261,42 @@ void pause(sf::RenderWindow* window)
         {
             window->close();
             return;
+        }
+    }
+}
+
+bool endOfGame(sf::RenderWindow *window, int& score)
+{
+    sf::Text gameOver, scoreText, playAgain;
+
+    // string constant seperated by double spaces because of inconsistent font
+    initText(gameOver, 50, ((score < (800 / BLOCK_WIDTH) * (800 / BLOCK_WIDTH)) ? "GAME  OVER" : "VICTORY"), sf::Vector2f(290, 375));
+    initText(scoreText, 40, std::string("Score " + std::to_string(score)).c_str(), sf::Vector2f(335, 420));
+    initText(playAgain, 40, "Would  you  like  to  play  again    y    n", sf::Vector2f(80, 465));
+    
+    window->clear();
+    window->draw(gameOver);
+    window->draw(scoreText);
+    window->draw(playAgain);
+    window->display();
+    
+    sf::Event event;
+    while (window->isOpen())
+    {
+        window->waitEvent(event);
+        if (event.type == sf::Event::Closed)
+        {
+            window->close();
+            return false;
+        }
+        else if (event.type == sf::Event::KeyPressed)
+        {
+            if (event.key.code == sf::Keyboard::Y)
+                return true;
+            else if (event.key.code == sf::Keyboard::N)
+                return false;
+            else if (event.key.code == sf::Keyboard::Escape)
+                pause(window);
         }
     }
 }

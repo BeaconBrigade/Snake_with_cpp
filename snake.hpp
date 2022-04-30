@@ -13,7 +13,7 @@
 #include "ResourcePath.hpp"
 #include <vector>
 
-const float BLOCK_WIDTH = 20.0f;
+const float BLOCK_WIDTH = 40.0f;
 
 class Snake
 {
@@ -24,6 +24,7 @@ public:
     sf::Sprite m_Sprite;
 public:
     Snake(bool isLead = false, bool isSnake = false);
+    ~Snake();
 };
 
 class Food : public Snake
