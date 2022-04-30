@@ -7,11 +7,12 @@
 //
 
 #include "snake.hpp"
+
 sf::Vector2f Snake::m_HeadDirection = sf::Vector2<float>(0.f, 0.f);
 std::vector<Snake*> Snake::m_SnakeList;
 sf::Texture Snake::m_Texture;
 
-const float SCALE = BLOCK_WIDTH / 20.0f;
+static const float SCALE = BLOCK_WIDTH / 20.0f;
 static int offsetDirection = -1, offset = 255;
 
 Snake::Snake(bool isLead, bool isSnake)
