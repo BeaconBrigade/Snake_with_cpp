@@ -13,7 +13,7 @@
 #include "ResourcePath.hpp"
 #include <vector>
 
-const float BLOCK_WIDTH = 20.0f;
+const float BLOCK_WIDTH = 40.0f;
 
 class Snake
 {

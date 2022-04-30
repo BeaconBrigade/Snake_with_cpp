@@ -25,6 +25,7 @@ Snake::Snake(bool isLead, bool isSnake)
     
     Snake::m_Sprite.setTexture(Snake::m_Texture);
     Snake::m_Sprite.setScale(SCALE, SCALE);
+    Snake::m_Sprite.setPosition(400, 400);
     
     if (isSnake)
         Snake::m_SnakeList.push_back(this);
@@ -45,6 +46,7 @@ Snake::~Snake()
         offsetDirection = -1;
         offset = 255;        
     }
+    Snake::m_SnakeList.pop_back();
 }
 
 Food::Food()

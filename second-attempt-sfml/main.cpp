@@ -16,8 +16,8 @@
 
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
-#include "ResourcePath.hpp"
 #include <string>
+#include "ResourcePath.hpp"
 #include "snake.hpp"
 
 const sf::Vector2<float> UP (0.f, -BLOCK_WIDTH / 2);
@@ -34,7 +34,7 @@ int main()
 {
     // create the main window
     sf::RenderWindow window(sf::VideoMode(800, 800), "Snake Game!");
-    window.setFramerateLimit(30);
+    window.setFramerateLimit(24); // normal is 24
     
     while (window.isOpen())
     {
@@ -50,26 +50,27 @@ bool gameLoop(sf::RenderWindow& window)
     // game setup
     bool hasChangedDirection = false, brokeBoundaries = false, doneMoving = true, started = false;
     sf::Vector2f toChange(0.f, 0.f);
-    int score = 8;
+    int score, frames = 0;
     
     // head snake
     Snake head(true, true);
-    head.m_Sprite.setPosition(400, 400);
     
     // initial follower snakes
     for (int i = 0; i < 8; i++)
-    {
         Snake *snek = new Snake(false, true);
-        snek->m_Sprite.setPosition(400, 400);
-    }
+        
+    score = head.m_SnakeList.size();
 
     // food
     Food *snack = new Food();
     
-    // Start the game loop
+    // start game with a pause
+    pause(&window);
+    
+    // start the game loop
     while (window.isOpen())
     {
-        // Process events
+        // event handling
         sf::Event event;
         while (window.pollEvent(event))
         {
@@ -140,7 +141,7 @@ bool gameLoop(sf::RenderWindow& window)
             score += 3;
         }
             
-        // Clear screen
+        // clear screen
         window.clear();
         
         // update all following snake positions
@@ -164,16 +165,18 @@ bool gameLoop(sf::RenderWindow& window)
         // prevent collision on start of game
         if (hasChangedDirection)
             started = true;
+        if (started)
+            frames++;
         hasChangedDirection = false;
         
         // collision with boundaries
-        if (head.m_Sprite.getPosition().x < 0 || head.m_Sprite.getPosition().x > 780 || head.m_Sprite.getPosition().y < 0 || head.m_Sprite.getPosition().y > 780)
+        if (head.m_Sprite.getPosition().x < 0 || head.m_Sprite.getPosition().x > 800 - (int)BLOCK_WIDTH || head.m_Sprite.getPosition().y < 0 || head.m_Sprite.getPosition().y > 800 - (int)BLOCK_WIDTH)
             brokeBoundaries = true;
         
         // collision with self
         for (int i = 1; i < head.m_SnakeList.size(); i++)
         {
-            if (head.m_Sprite.getPosition() == head.m_SnakeList[i]->m_Sprite.getPosition() && started)
+            if (head.m_Sprite.getPosition() == head.m_SnakeList[i]->m_Sprite.getPosition() && frames > 8)
                 brokeBoundaries = true;
         }
         
@@ -201,11 +204,7 @@ bool gameLoop(sf::RenderWindow& window)
     // free memory, make sure not to delete m_SnakeList[0]
     // because that was stack allocated...
     for (int i = head.m_SnakeList.size() - 1; i > 0; i--)
-    {
         delete head.m_SnakeList[i];
-        head.m_SnakeList.pop_back();
-    }
-    head.m_SnakeList.pop_back();
     
     return endOfGame(&window, score);
 }
@@ -223,11 +222,13 @@ void initText(sf::Text& text, int size, const char *str, sf::Vector2f pos)
 void pause(sf::RenderWindow *window)
 {
     // string constant seperated by double spaces because of inconsistent font
-    sf::Text countdown;
+    sf::Text countdown, instruction;
     initText(countdown, 40, "Press  any  key  to  continue", sf::Vector2f(100, 375));
-
+    initText(instruction, 40, "use  wasd  to  move", sf::Vector2f(205, 425));
+    
     window->clear();
     window->draw(countdown);
+    window->draw(instruction);
     window->display();
     
     sf::Event event;
@@ -269,9 +270,9 @@ bool endOfGame(sf::RenderWindow *window, int& score)
     sf::Text gameOver, scoreText, playAgain;
 
     // string constant seperated by double spaces because of inconsistent font
-    initText(gameOver, 50, "GAME  OVER", sf::Vector2f(290, 375));
+    initText(gameOver, 50, ((score < (800 / BLOCK_WIDTH) * (800 / BLOCK_WIDTH)) ? "GAME  OVER" : "VICTORY"), sf::Vector2f(290, 375));
     initText(scoreText, 40, std::string("Score " + std::to_string(score)).c_str(), sf::Vector2f(335, 420));
-    initText(playAgain, 40, "Would  you  like  to  play  again  y  n", sf::Vector2f(100, 465));
+    initText(playAgain, 40, "Would  you  like  to  play  again    y    n", sf::Vector2f(80, 465));
     
     window->clear();
     window->draw(gameOver);
