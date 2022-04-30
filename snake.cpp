@@ -38,6 +38,15 @@ Snake::Snake(bool isLead, bool isSnake)
     offset += 6 * offsetDirection;
 }
 
+Snake::~Snake()
+{
+    if (Snake::m_SnakeList.size() == 1)
+    {
+        offsetDirection = -1;
+        offset = 255;        
+    }
+}
+
 Food::Food()
 {
     bool flagRaised;

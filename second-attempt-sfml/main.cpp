@@ -54,10 +54,14 @@ bool gameLoop(sf::RenderWindow& window)
     
     // head snake
     Snake head(true, true);
+    head.m_Sprite.setPosition(400, 400);
     
     // initial follower snakes
     for (int i = 0; i < 8; i++)
+    {
         Snake *snek = new Snake(false, true);
+        snek->m_Sprite.setPosition(400, 400);
+    }
 
     // food
     Food *snack = new Food();
@@ -163,7 +167,7 @@ bool gameLoop(sf::RenderWindow& window)
         hasChangedDirection = false;
         
         // collision with boundaries
-        if (head.m_Sprite.getPosition().x < 0 || head.m_Sprite.getPosition().x > 800 || head.m_Sprite.getPosition().y < 0 || head.m_Sprite.getPosition().y > 800)
+        if (head.m_Sprite.getPosition().x < 0 || head.m_Sprite.getPosition().x > 780 || head.m_Sprite.getPosition().y < 0 || head.m_Sprite.getPosition().y > 780)
             brokeBoundaries = true;
         
         // collision with self
@@ -176,6 +180,23 @@ bool gameLoop(sf::RenderWindow& window)
         if (brokeBoundaries)
             break;
     }
+    
+    window.clear();
+    
+    // update all following snake positions
+    for (int i = head.m_SnakeList.size() - 1; i > 0; i--)
+    {
+        head.m_SnakeList[i]->m_Sprite.setPosition(head.m_SnakeList[i - 1]->m_Sprite.getPosition());
+        head.m_SnakeList[i]->m_Sprite.setColor(sf::Color::Red);
+        window.draw(head.m_SnakeList[i]->m_Sprite);
+    }
+    
+    window.draw(snack->m_Sprite);
+    head.m_Sprite.setColor(sf::Color::Red);
+    window.draw(head.m_Sprite);
+    
+    window.display();
+    sf::sleep(sf::seconds(1));
     
     // free memory, make sure not to delete m_SnakeList[0]
     // because that was stack allocated...
@@ -250,7 +271,7 @@ bool endOfGame(sf::RenderWindow *window, int& score)
     // string constant seperated by double spaces because of inconsistent font
     initText(gameOver, 50, "GAME  OVER", sf::Vector2f(290, 375));
     initText(scoreText, 40, std::string("Score " + std::to_string(score)).c_str(), sf::Vector2f(335, 420));
-    initText(playAgain, 40, "Would  you  like  to  play  again  yn", sf::Vector2f(100, 465));
+    initText(playAgain, 40, "Would  you  like  to  play  again  y  n", sf::Vector2f(100, 465));
     
     window->clear();
     window->draw(gameOver);
@@ -273,6 +294,8 @@ bool endOfGame(sf::RenderWindow *window, int& score)
                 return true;
             else if (event.key.code == sf::Keyboard::N)
                 return false;
+            else if (event.key.code == sf::Keyboard::Escape)
+                pause(window);
         }
     }
 }
