@@ -10,7 +10,6 @@
 #define snake_hpp
 
 #include <SFML/Graphics.hpp>
-#include "ResourcePath.hpp"
 #include <vector>
 
 const float BLOCK_WIDTH = 40.0f;
