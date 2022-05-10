@@ -14,10 +14,8 @@
 // function `resourcePath()` from ResourcePath.hpp
 //
 
-#include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 #include <string>
-#include "ResourcePath.hpp"
 #include "snake.hpp"
 
 const sf::Vector2<float> UP (0.f, -BLOCK_WIDTH / 2);
@@ -57,7 +55,7 @@ bool gameLoop(sf::RenderWindow& window)
     
     // initial follower snakes
     for (int i = 0; i < 8; i++)
-        Snake *snek = new Snake(false, true);
+        new Snake(false, true);
         
     score = head.m_SnakeList.size();
 
@@ -145,7 +143,7 @@ bool gameLoop(sf::RenderWindow& window)
         window.clear();
         
         // update all following snake positions
-        for (int i = head.m_SnakeList.size() - 1; i > 0; i--)
+        for (long unsigned i = head.m_SnakeList.size() - 1; i > 0; i--)
         {
             head.m_SnakeList[i]->m_Sprite.setPosition(head.m_SnakeList[i - 1]->m_Sprite.getPosition());
             window.draw(head.m_SnakeList[i]->m_Sprite);
@@ -174,7 +172,7 @@ bool gameLoop(sf::RenderWindow& window)
             brokeBoundaries = true;
         
         // collision with self
-        for (int i = 1; i < head.m_SnakeList.size(); i++)
+        for (long unsigned i = 1; i < head.m_SnakeList.size(); i++)
         {
             if (head.m_Sprite.getPosition() == head.m_SnakeList[i]->m_Sprite.getPosition() && frames > 8)
                 brokeBoundaries = true;
@@ -299,4 +297,5 @@ bool endOfGame(sf::RenderWindow *window, int& score)
                 pause(window);
         }
     }
+	return false;
 }
