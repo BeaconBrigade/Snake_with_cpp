@@ -12,4 +12,4 @@ be in the Linux directory. To run the project on Linux, just navigate to this re
 
 ## Demo
 
-![https://youtube.com/shorts/SlZPnMSW6JQ?feature=share](https://user-images.githubusercontent.com/100320298/171223933-235a6cad-c7a0-4e8f-b65e-0b8903b6ecd1.gif)
+![https://youtube.com/shorts/SlZPnMSW6JQ?feature=share](https://user-images.githubusercontent.com/100320298/171225319-e0ee7779-fe3a-4a67-8f4e-bfae19e9a47f.gif)
