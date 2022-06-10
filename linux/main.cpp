@@ -92,7 +92,7 @@ bool gameLoop(sf::RenderWindow& window)
                             hasChangedDirection = true;
                         }
                     }
-                    else if (event.key.code == sf::Keyboard::S || sf::Keyboard::Down)
+                    else if (event.key.code == sf::Keyboard::S || event.key.code == sf::Keyboard::Down)
                     {
                         if (head.m_HeadDirection != UP && !hasChangedDirection)
                         {
@@ -108,7 +108,7 @@ bool gameLoop(sf::RenderWindow& window)
                             hasChangedDirection = true;
                         }
                     }
-                    else if (event.key.code == sf::Keyboard::D || sf::Keyboard::Right)
+                    else if (event.key.code == sf::Keyboard::D || event.key.code == sf::Keyboard::Right)
                     {
                         if (head.m_HeadDirection != LEFT && !hasChangedDirection)
                         {
