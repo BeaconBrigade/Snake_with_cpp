@@ -84,7 +84,7 @@ bool gameLoop(sf::RenderWindow& window)
                     if (event.key.code == sf::Keyboard::Escape)
                         pause(&window);
         
-                    if (event.key.code == sf::Keyboard::W)
+                    if (event.key.code == sf::Keyboard::W || event.key.code == sf::Keyboard::Up)
                     {
                         if (head.m_HeadDirection != DOWN && !hasChangedDirection)
                         {
@@ -92,7 +92,7 @@ bool gameLoop(sf::RenderWindow& window)
                             hasChangedDirection = true;
                         }
                     }
-                    else if (event.key.code == sf::Keyboard::S)
+                    else if (event.key.code == sf::Keyboard::S || sf::Keyboard::Down)
                     {
                         if (head.m_HeadDirection != UP && !hasChangedDirection)
                         {
@@ -100,7 +100,7 @@ bool gameLoop(sf::RenderWindow& window)
                             hasChangedDirection = true;
                         }
                     }
-                    else if (event.key.code == sf::Keyboard::A)
+                    else if (event.key.code == sf::Keyboard::A || sf::Keyboard::Left)
                     {
                         if (head.m_HeadDirection != RIGHT && !hasChangedDirection)
                         {
@@ -108,7 +108,7 @@ bool gameLoop(sf::RenderWindow& window)
                             hasChangedDirection = true;
                         }
                     }
-                    else if (event.key.code == sf::Keyboard::D)
+                    else if (event.key.code == sf::Keyboard::D || sf::Keyboard::Right)
                     {
                         if (head.m_HeadDirection != LEFT && !hasChangedDirection)
                         {
