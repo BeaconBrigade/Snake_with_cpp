@@ -100,7 +100,7 @@ bool gameLoop(sf::RenderWindow& window)
                             hasChangedDirection = true;
                         }
                     }
-                    else if (event.key.code == sf::Keyboard::A || sf::Keyboard::Left)
+                    else if (event.key.code == sf::Keyboard::A || event.key.code == sf::Keyboard::Left)
                     {
                         if (head.m_HeadDirection != RIGHT && !hasChangedDirection)
                         {

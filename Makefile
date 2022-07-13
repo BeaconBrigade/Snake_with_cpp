@@ -4,7 +4,7 @@ CC = g++
 SRC = *.cpp
 OBJ = *.o
 LIB = -lsfml-graphics -lsfml-window -lsfml-system -lpthread 
-LFLAGS = -s
+LFLAGS =
 CFLAGS = -Wall -std=c++17
 
 snake-app.out: $(OBJ)
